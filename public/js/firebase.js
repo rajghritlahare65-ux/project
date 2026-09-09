@@ -17,7 +17,7 @@ import {
 const firebaseConfig = {
 
     apiKey:
-        "YOUR_API_KEY",
+        "AIzaSyA-Yed4LtEMMKmHzCIAaiON3zC2mZlmIlA",
 
     authDomain:
         "love-proposal-d4298.firebaseapp.com",
@@ -29,10 +29,10 @@ const firebaseConfig = {
         "love-proposal-d4298.firebasestorage.app",
 
     messagingSenderId:
-        "YOUR_MESSAGING_SENDER_ID",
+        "394527182364",
 
     appId:
-        "YOUR_APP_ID"
+        "1:394527182364:web:8a75b88d2798041e0619d9"
 
 };
 
