@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>One Last Little Thing ❤️</title>
+
+<link rel="stylesheet"
+href="css/global.css">
+
+<style>
+
+.response-page {
+
+    min-height: 100vh;
+
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 25px;
+
+}
+
+.response-card {
+
+    width: min(650px, 100%);
+
+    padding: 55px 35px;
+
+    border-radius: 30px;
+
+    text-align: center;
+
+}
+
+.response-card h1 {
+
+    font-size:
+        clamp(45px, 7vw, 75px);
+
+    font-weight: 400;
+
+}
+
+.response-card p {
+
+    color: #c8b4bc;
+
+    margin-top: 20px;
+
+    line-height: 1.7;
+
+}
+
+textarea {
+
+    width: 100%;
+
+    min-height: 180px;
+
+    margin-top: 35px;
+
+    padding: 20px;
+
+    resize: vertical;
+
+    border-radius: 20px;
+
+    border:
+        1px solid rgba(255,255,255,.12);
+
+    background:
+        rgba(0,0,0,.25);
+
+    color: white;
+
+    outline: none;
+
+}
+
+textarea:focus {
+
+    border-color:
+        var(--rose);
+
+}
+
+.submit {
+
+    margin-top: 20px;
+
+}
+
+.status {
+
+    margin-top: 20px;
+
+    color: var(--pink);
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="hearts"></div>
+
+<div class="stars"></div>
+
+<div class="background-glow glow-one"></div>
+
+
+<main class="response-page">
+
+<div class="response-card glass">
+
+<h1>
+One last little thing...
+</h1>
+
+<p>
+
+Whatever your answer was,
+thank you for taking this little journey with me. ❤️
+
+<br><br>
+
+If you want, leave me something
+you'd like me to remember.
+
+</p>
+
+
+<textarea
+id="message"
+placeholder="Write whatever is in your heart...">
+</textarea>
+
+
+<button
+class="love-button submit"
+id="submitButton">
+
+Send it to me ❤️
+
+</button>
+
+<div
+class="status"
+id="status">
+</div>
+
+</div>
+
+</main>
+
+
+<script src="js/global.js"></script>
+
+<script type="module">
+
+import {
+    saveResponse
+} from "./js/firebase.js";
+
+
+const message =
+    document.getElementById("message");
+
+const button =
+    document.getElementById("submitButton");
+
+const status =
+    document.getElementById("status");
+
+
+button.addEventListener(
+    "click",
+    async () => {
+
+        const text =
+            message.value.trim();
+
+        if (!text) {
+
+            status.textContent =
+                "Write something first ❤️";
+
+            return;
+
+        }
+
+        button.disabled = true;
+
+        status.textContent =
+            "Sending...";
+
+        try {
+
+            const answer =
+                localStorage.getItem(
+                    "proposalAnswer"
+                ) || "UNKNOWN";
+
+            await saveResponse(
+                answer,
+                text
+            );
+
+            status.textContent =
+                "Your message has been sent ❤️";
+
+            message.value = "";
+
+        } catch(error) {
+
+            console.error(error);
+
+            status.textContent =
+                "Something went wrong. Please try again.";
+
+            button.disabled = false;
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>

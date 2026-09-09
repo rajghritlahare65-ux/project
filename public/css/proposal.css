@@ -1,0 +1,392 @@
+.proposal {
+
+    min-height: 100vh;
+
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 50px 20px;
+
+}
+
+
+.proposal-label {
+
+    color: var(--gold);
+
+    letter-spacing: 5px;
+
+    font-size: 10px;
+
+    margin-bottom: 35px;
+
+}
+
+
+/* ENVELOPE */
+
+.envelope {
+
+    position: relative;
+
+    width: min(850px, 100%);
+
+    min-height: 650px;
+
+    border-radius: 25px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.08),
+            rgba(255,255,255,.025)
+        );
+
+    border:
+        1px solid rgba(255,255,255,.12);
+
+    box-shadow:
+        0 40px 120px rgba(0,0,0,.5);
+
+    overflow: hidden;
+
+    animation:
+        envelopeIn 1.5s ease;
+
+}
+
+
+/* LETTER */
+
+.letter {
+
+    position: relative;
+
+    padding: 70px;
+
+    height: 100%;
+
+}
+
+
+.letter-content {
+
+    text-align: center;
+
+}
+
+
+.letter-top {
+
+    color: var(--gold);
+
+    font-size: 12px;
+
+    letter-spacing: 3px;
+
+    margin-bottom: 25px;
+
+}
+
+
+.letter h1 {
+
+    font-size:
+        clamp(45px, 6vw, 75px);
+
+    font-weight: 400;
+
+    line-height: 1;
+
+}
+
+
+.letter-text {
+
+    max-width: 650px;
+
+    margin:
+        35px auto;
+
+    color: #d6c3ca;
+
+    font-size: 16px;
+
+    line-height: 1.9;
+
+}
+
+
+.quote {
+
+    max-width: 600px;
+
+    margin:
+        40px auto;
+
+    color: var(--pink);
+
+    font-family:
+        "Cormorant Garamond",
+        serif;
+
+    font-style: italic;
+
+    font-size: 25px;
+
+    line-height: 1.4;
+
+}
+
+
+.proposal-question {
+
+    margin-top: 40px;
+
+    font-family:
+        "Cormorant Garamond",
+        serif;
+
+    font-size: 36px;
+
+    color: var(--soft-pink);
+
+}
+
+
+.choice-buttons {
+
+    margin-top: 35px;
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 15px;
+
+    flex-wrap: wrap;
+
+}
+
+
+.yes-button {
+
+    border: none;
+
+    background:
+        linear-gradient(
+            135deg,
+            #e85d75,
+            #a82c4b
+        );
+
+    color: white;
+
+    padding:
+        17px 35px;
+
+    border-radius: 50px;
+
+    box-shadow:
+        0 15px 50px
+        rgba(232,93,117,.25);
+
+    transition:
+        all .3s ease;
+
+}
+
+
+.yes-button:hover {
+
+    transform:
+        translateY(-4px)
+        scale(1.03);
+
+}
+
+
+.no-button {
+
+    border:
+        1px solid rgba(255,255,255,.15);
+
+    background:
+        rgba(255,255,255,.04);
+
+    color: #c5b4ba;
+
+    padding:
+        17px 25px;
+
+    border-radius: 50px;
+
+    transition:
+        all .3s ease;
+
+}
+
+
+.no-button:hover {
+
+    background:
+        rgba(255,255,255,.08);
+
+}
+
+
+/* CELEBRATION */
+
+.celebration {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 200;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    text-align: center;
+
+    padding: 25px;
+
+    background:
+        radial-gradient(
+            circle,
+            #481225,
+            #14070d 55%,
+            #080509
+        );
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transition:
+        all 1s ease;
+
+}
+
+
+.celebration.active {
+
+    opacity: 1;
+
+    visibility: visible;
+
+}
+
+
+.celebration-heart {
+
+    font-size: 100px;
+
+    animation:
+        celebrationPulse 1.5s infinite;
+
+}
+
+
+.celebration h2 {
+
+    margin-top: 25px;
+
+    font-size:
+        clamp(50px, 8vw, 90px);
+
+    font-weight: 400;
+
+    color: var(--pink);
+
+}
+
+
+.celebration p {
+
+    margin:
+        20px 0 30px;
+
+    color: #d0bbc2;
+
+}
+
+
+@keyframes envelopeIn {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(50px)
+            scale(.95);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0)
+            scale(1);
+
+    }
+
+}
+
+
+@keyframes celebrationPulse {
+
+    0%,100% {
+
+        transform: scale(1);
+
+    }
+
+    50% {
+
+        transform: scale(1.2);
+
+    }
+
+}
+
+
+@media(max-width:600px) {
+
+    .letter {
+
+        padding: 45px 25px;
+
+    }
+
+    .letter-text {
+
+        font-size: 14px;
+
+    }
+
+    .proposal-question {
+
+        font-size: 30px;
+
+    }
+
+}
