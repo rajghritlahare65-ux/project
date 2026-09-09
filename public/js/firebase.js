@@ -1,27 +1,32 @@
 import {
     initializeApp
-} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+} from
+"https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+
 
 import {
     getFirestore,
     collection,
-    addDoc,
-    serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+    getDocs,
+    query,
+    orderBy
+} from
+"https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
 
 const firebaseConfig = {
 
-    apiKey: "YOUR_API_KEY",
+    apiKey:
+        "YOUR_API_KEY",
 
     authDomain:
-        "YOUR_PROJECT.firebaseapp.com",
+        "love-proposal-d4298.firebaseapp.com",
 
     projectId:
-        "YOUR_PROJECT_ID",
+        "love-proposal-d4298",
 
     storageBucket:
-        "YOUR_PROJECT.firebasestorage.app",
+        "love-proposal-d4298.firebasestorage.app",
 
     messagingSenderId:
         "YOUR_MESSAGING_SENDER_ID",
@@ -33,33 +38,49 @@ const firebaseConfig = {
 
 
 const app =
-    initializeApp(firebaseConfig);
+    initializeApp(
+        firebaseConfig
+    );
 
 
-const db =
+export const db =
     getFirestore(app);
 
 
-export async function saveResponse(
-    answer,
-    message
-) {
+export async function getResponses() {
 
-    await addDoc(
+    const responsesRef =
         collection(
             db,
-            "responses"
-        ),
-        {
+            "proposalResponses"
+        );
 
-            answer: answer,
 
-            message: message,
+    const responsesQuery =
+        query(
+            responsesRef,
 
-            createdAt:
-                serverTimestamp()
+            orderBy(
+                "createdAt",
+                "desc"
+            )
+        );
 
-        }
+
+    const snapshot =
+        await getDocs(
+            responsesQuery
+        );
+
+
+    return snapshot.docs.map(
+        doc => ({
+
+            id: doc.id,
+
+            ...doc.data()
+
+        })
     );
 
 }
