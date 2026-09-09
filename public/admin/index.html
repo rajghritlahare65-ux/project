@@ -10,592 +10,124 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <meta
-        name="theme-color"
-        content="#090509"
+    <title>Love Proposal — Admin</title>
+
+    <link
+        rel="stylesheet"
+        href="/admin/admin.css"
     >
-
-    <title>Private Dashboard ❤️</title>
-
-    <link rel="stylesheet" href="admin.css">
 
 </head>
 
-
 <body>
 
-    <div class="background-glow glow-1"></div>
-    <div class="background-glow glow-2"></div>
+<div class="background"></div>
+
+<header class="topbar">
+
+    <div>
+        <h1>❤️ Love Proposal</h1>
+        <p>Private Response Dashboard</p>
+    </div>
+
+    <button id="refreshButton">
+        ↻ Refresh
+    </button>
+
+</header>
 
 
-    <header class="dashboard-header">
+<main class="dashboard">
 
-        <div>
+    <section class="stats">
 
-            <div class="eyebrow">
-                PRIVATE • LOVE PROPOSAL
+        <div class="stat-card">
+
+            <span>💌</span>
+
+            <div>
+                <small>Total Responses</small>
+                <h2 id="totalResponses">0</h2>
             </div>
-
-            <h1>
-                Her <span>Response</span> ❤️
-            </h1>
-
-            <p class="header-subtitle">
-                Everything she chose to share with you.
-            </p>
 
         </div>
 
 
-        <button
-            id="refreshBtn"
-            class="refresh-btn"
-        >
-            ↻ Refresh
-        </button>
+        <div class="stat-card">
 
-    </header>
+            <span>❤️</span>
 
-
-    <main class="dashboard">
-
-
-        <!-- STATISTICS -->
-
-        <section class="stats">
-
-            <div class="stat-card">
-
-                <span>
-                    Total responses
-                </span>
-
-                <strong id="responseCount">
-                    —
-                </strong>
-
+            <div>
+                <small>Yes Responses</small>
+                <h2 id="yesResponses">0</h2>
             </div>
 
+        </div>
 
-            <div class="stat-card">
 
-                <span>
-                    Latest answer
-                </span>
+        <div class="stat-card">
 
-                <strong id="latestAnswer">
-                    —
-                </strong>
+            <span>💬</span>
 
+            <div>
+                <small>Messages</small>
+                <h2 id="messageCount">0</h2>
             </div>
 
+        </div>
 
-            <div class="stat-card">
+    </section>
 
-                <span>
-                    Last response
-                </span>
 
-                <strong
-                    id="latestDate"
-                    class="small-value"
-                >
-                    —
-                </strong>
+    <section class="latest">
 
+        <div class="section-title">
+
+            <div>
+                <span>✨ Latest Response</span>
+                <h2 id="latestAnswer">
+                    Waiting for response...
+                </h2>
             </div>
 
-        </section>
+            <div id="latestDate"></div>
 
+        </div>
 
-        <!-- RESPONSE SECTION -->
+        <div class="latest-message">
 
-        <section class="responses-section">
+            <p id="latestMessage">
+                No message yet.
+            </p>
 
-            <div class="section-heading">
+        </div>
 
-                <div>
+    </section>
 
-                    <p class="eyebrow">
-                        HER WORDS
-                    </p>
 
-                    <h2>
-                        Your little memories
-                    </h2>
+    <section>
 
-                </div>
+        <div class="section-heading">
 
-            </div>
+            <h2>All Responses</h2>
 
+            <span id="responseStatus">
+                Loading...
+            </span>
 
-            <div
-                id="loading"
-                class="loading"
-            >
+        </div>
 
-                <div class="loader"></div>
+        <div id="responsesContainer">
 
-                Reading her response...
+        </div>
 
-            </div>
+    </section>
 
+</main>
 
-            <div
-                id="errorState"
-                class="error-state hidden"
-            >
-
-                <div>
-                    ⚠️
-                </div>
-
-                <h3>
-                    Something went wrong
-                </h3>
-
-                <p id="errorMessage">
-                    Unable to load responses.
-                </p>
-
-                <button
-                    id="retryBtn"
-                    class="retry-btn"
-                >
-                    Try again
-                </button>
-
-            </div>
-
-
-            <div
-                id="emptyState"
-                class="empty-state hidden"
-            >
-
-                <div class="empty-heart">
-                    💌
-                </div>
-
-                <h3>
-                    Nothing yet
-                </h3>
-
-                <p>
-                    When she answers your proposal,
-                    her response will appear here.
-                </p>
-
-            </div>
-
-
-            <div
-                id="responsesContainer"
-                class="responses-container"
-            ></div>
-
-        </section>
-
-
-    </main>
-
-
-    <script type="module">
-
-        import {
-            getResponses
-        } from "../js/firebase.js";
-
-
-        const container =
-            document.getElementById(
-                "responsesContainer"
-            );
-
-        const loading =
-            document.getElementById(
-                "loading"
-            );
-
-        const empty =
-            document.getElementById(
-                "emptyState"
-            );
-
-        const errorState =
-            document.getElementById(
-                "errorState"
-            );
-
-        const errorMessage =
-            document.getElementById(
-                "errorMessage"
-            );
-
-        const count =
-            document.getElementById(
-                "responseCount"
-            );
-
-        const latestAnswer =
-            document.getElementById(
-                "latestAnswer"
-            );
-
-        const latestDate =
-            document.getElementById(
-                "latestDate"
-            );
-
-
-        async function loadResponses() {
-
-            loading.classList.remove(
-                "hidden"
-            );
-
-            errorState.classList.add(
-                "hidden"
-            );
-
-            empty.classList.add(
-                "hidden"
-            );
-
-            container.innerHTML = "";
-
-
-            try {
-
-                const responses =
-                    await getResponses();
-
-
-                loading.classList.add(
-                    "hidden"
-                );
-
-
-                count.textContent =
-                    responses.length;
-
-
-                if (
-                    responses.length === 0
-                ) {
-
-                    latestAnswer.textContent =
-                        "Waiting...";
-
-                    latestDate.textContent =
-                        "—";
-
-                    empty.classList.remove(
-                        "hidden"
-                    );
-
-                    return;
-
-                }
-
-
-                const latest =
-                    responses[0];
-
-
-                latestAnswer.textContent =
-                    latest.answer ||
-                    "—";
-
-
-                latestDate.textContent =
-                    formatDate(
-                        latest.createdAt
-                    );
-
-
-                responses.forEach(
-                    renderResponse
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    "Admin error:",
-                    error
-                );
-
-
-                loading.classList.add(
-                    "hidden"
-                );
-
-
-                errorMessage.textContent =
-                    error.message ||
-                    "Unable to load responses.";
-
-
-                errorState.classList.remove(
-                    "hidden"
-                );
-
-            }
-
-        }
-
-
-        function renderResponse(
-            response
-        ) {
-
-            const card =
-                document.createElement(
-                    "article"
-                );
-
-
-            card.className =
-                "response-card";
-
-
-            const date =
-                formatDate(
-                    response.createdAt
-                );
-
-
-            const answer =
-                response.answer ||
-                "No answer";
-
-
-            const message =
-                response.message ||
-                "No message was written.";
-
-
-            card.innerHTML = `
-
-                <div class="response-top">
-
-                    <span class="response-label">
-                        RESPONSE
-                    </span>
-
-                    <span class="response-date">
-                        ${escapeHTML(date)}
-                    </span>
-
-                </div>
-
-
-                <div class="answer-box">
-
-                    <span class="box-label">
-                        HER ANSWER
-                    </span>
-
-                    <h3>
-                        ${escapeHTML(answer)}
-                    </h3>
-
-                </div>
-
-
-                <div class="message-box">
-
-                    <span class="box-label">
-                        HER MESSAGE
-                    </span>
-
-                    <p>
-                        ${escapeHTML(message)}
-                    </p>
-
-                </div>
-
-
-                <div class="questions-box">
-
-                    <span class="box-label">
-                        HER JOURNEY ANSWERS
-                    </span>
-
-                    <div class="question-list">
-
-                        ${
-                            renderQuestions(
-                                response.questions
-                            )
-                        }
-
-                    </div>
-
-                </div>
-
-            `;
-
-
-            container.appendChild(card);
-
-        }
-
-
-        function renderQuestions(
-            questions
-        ) {
-
-            if (
-                !questions ||
-                Object.keys(questions).length === 0
-            ) {
-
-                return `
-                    <p class="no-data">
-                        No question responses recorded.
-                    </p>
-                `;
-
-            }
-
-
-            return Object.entries(
-                questions
-            )
-            .map(
-                ([question, answer]) => `
-
-                    <div class="question-row">
-
-                        <div class="question">
-                            ${escapeHTML(question)}
-                        </div>
-
-                        <div class="question-answer">
-                            ${escapeHTML(
-                                String(answer)
-                            )}
-                        </div>
-
-                    </div>
-
-                `
-            )
-            .join("");
-
-        }
-
-
-        function formatDate(
-            timestamp
-        ) {
-
-            if (!timestamp) {
-
-                return "Unknown time";
-
-            }
-
-
-            try {
-
-                let date;
-
-
-                if (
-                    timestamp.seconds
-                ) {
-
-                    date =
-                        new Date(
-                            timestamp.seconds *
-                            1000
-                        );
-
-                } else {
-
-                    date =
-                        new Date(
-                            timestamp
-                        );
-
-                }
-
-
-                return date.toLocaleString(
-                    "en-IN",
-                    {
-                        dateStyle:
-                            "medium",
-                        timeStyle:
-                            "short"
-                    }
-                );
-
-            } catch {
-
-                return "Unknown time";
-
-            }
-
-        }
-
-
-        function escapeHTML(
-            value
-        ) {
-
-            return String(value)
-                .replaceAll(
-                    "&",
-                    "&amp;"
-                )
-                .replaceAll(
-                    "<",
-                    "&lt;"
-                )
-                .replaceAll(
-                    ">",
-                    "&gt;"
-                )
-                .replaceAll(
-                    '"',
-                    "&quot;"
-                )
-                .replaceAll(
-                    "'",
-                    "&#039;"
-                );
-
-        }
-
-
-        document
-            .getElementById(
-                "refreshBtn"
-            )
-            .addEventListener(
-                "click",
-                loadResponses
-            );
-
-
-        document
-            .getElementById(
-                "retryBtn"
-            )
-            .addEventListener(
-                "click",
-                loadResponses
-            );
-
-
-        loadResponses();
-
-    </script>
+<script
+    src="/admin/admin.js"
+></script>
 
 </body>
-
 </html>

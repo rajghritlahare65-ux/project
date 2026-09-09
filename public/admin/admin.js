@@ -1,240 +1,253 @@
-import {
-    initializeApp
-} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+const container =
+    document.getElementById("responsesContainer");
 
-import {
-    getAuth,
-    signInWithEmailAndPassword,
-    onAuthStateChanged,
-    signOut
-} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+const totalResponses =
+    document.getElementById("totalResponses");
 
-import {
-    getFirestore,
-    collection,
-    query,
-    orderBy,
-    getDocs
-} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+const yesResponses =
+    document.getElementById("yesResponses");
 
+const messageCount =
+    document.getElementById("messageCount");
 
-const firebaseConfig = {
+const latestAnswer =
+    document.getElementById("latestAnswer");
 
-    apiKey: "YOUR_API_KEY",
+const latestMessage =
+    document.getElementById("latestMessage");
 
-    authDomain:
-        "YOUR_PROJECT.firebaseapp.com",
+const latestDate =
+    document.getElementById("latestDate");
 
-    projectId:
-        "YOUR_PROJECT_ID",
-
-    storageBucket:
-        "YOUR_PROJECT.firebasestorage.app",
-
-    messagingSenderId:
-        "YOUR_MESSAGING_SENDER_ID",
-
-    appId:
-        "YOUR_APP_ID"
-
-};
+const status =
+    document.getElementById("responseStatus");
 
 
-const app =
-    initializeApp(firebaseConfig);
+function escapeHTML(value) {
 
+    if (value === null || value === undefined) {
+        return "";
+    }
 
-const auth =
-    getAuth(app);
-
-const db =
-    getFirestore(app);
-
-
-/* LOGIN */
-
-const login =
-    document.getElementById("login");
-
-
-if (login) {
-
-    login.addEventListener(
-        "click",
-        async () => {
-
-            const email =
-                document.getElementById("email").value;
-
-            const password =
-                document.getElementById("password").value;
-
-            const error =
-                document.getElementById("error");
-
-            try {
-
-                await signInWithEmailAndPassword(
-                    auth,
-                    email,
-                    password
-                );
-
-                window.location.href =
-                    "dashboard.html";
-
-            } catch(e) {
-
-                error.textContent =
-                    "Invalid login details.";
-
-            }
-
-        }
-    );
-
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 
-/* DASHBOARD */
+function formatDate(date) {
 
-const responses =
-    document.getElementById("responses");
+    if (!date) {
+        return "Unknown date";
+    }
+
+    return new Date(date).toLocaleString(
+        "en-IN",
+        {
+            dateStyle: "medium",
+            timeStyle: "short"
+        }
+    );
+}
 
 
-if (responses) {
+async function loadResponses() {
 
-    onAuthStateChanged(
-        auth,
-        async user => {
+    status.innerText = "Loading...";
 
-            if (!user) {
+    container.innerHTML = "";
 
-                window.location.href =
-                    "index.html";
+    try {
 
-                return;
+        const response =
+            await fetch("/api/responses");
 
+        const result =
+            await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(
+                result.message || "Unable to load responses"
+            );
+        }
+
+        const responses =
+            Array.isArray(result.responses)
+                ? result.responses
+                : [];
+
+        totalResponses.innerText =
+            responses.length;
+
+        const yesCount =
+            responses.filter(
+                item =>
+                    String(item.answer)
+                        .toLowerCase()
+                        .includes("yes")
+            ).length;
+
+        yesResponses.innerText =
+            yesCount;
+
+        const messages =
+            responses.filter(
+                item =>
+                    item.message &&
+                    item.message.trim()
+            ).length;
+
+        messageCount.innerText =
+            messages;
+
+
+        if (responses.length === 0) {
+
+            latestAnswer.innerText =
+                "Waiting for response...";
+
+            latestMessage.innerText =
+                "No response has been submitted yet.";
+
+            latestDate.innerText = "";
+
+            container.innerHTML = `
+                <div class="empty">
+                    💌 No responses yet.
+                </div>
+            `;
+
+            status.innerText = "0 responses";
+
+            return;
+        }
+
+
+        const latest =
+            responses[0];
+
+        latestAnswer.innerText =
+            latest.answer || "No answer";
+
+        latestMessage.innerText =
+            latest.message ||
+            "No written message.";
+
+        latestDate.innerText =
+            formatDate(latest.createdAt);
+
+
+        responses.forEach((item) => {
+
+            const card =
+                document.createElement("div");
+
+            card.className =
+                "response-card";
+
+            let questionsHTML = "";
+
+            if (
+                item.questions &&
+                Object.keys(item.questions).length
+            ) {
+
+                questionsHTML = `
+                    <div class="questions">
+
+                        <h3>Questions</h3>
+
+                        ${Object.entries(item.questions)
+                            .map(([question, answer]) => `
+                                <div class="question">
+
+                                    <strong>
+                                        ${escapeHTML(question)}
+                                    </strong>
+
+                                    <p>
+                                        ${escapeHTML(answer)}
+                                    </p>
+
+                                </div>
+                            `)
+                            .join("")}
+
+                    </div>
+                `;
             }
 
-            try {
 
-                const q =
-                    query(
-                        collection(
-                            db,
-                            "responses"
-                        ),
-                        orderBy(
-                            "createdAt",
-                            "desc"
+            card.innerHTML = `
+
+                <div class="response-header">
+
+                    <div class="answer">
+                        ${escapeHTML(
+                            item.answer || "No answer"
+                        )}
+                    </div>
+
+                    <div class="date">
+                        ${formatDate(item.createdAt)}
+                    </div>
+
+                </div>
+
+                <div class="message">
+
+                    ${
+                        escapeHTML(
+                            item.message ||
+                            "No written message."
                         )
-                    );
-
-                const snapshot =
-                    await getDocs(q);
-
-                responses.innerHTML = "";
-
-                if (snapshot.empty) {
-
-                    responses.innerHTML =
-                        `<p>No response yet ❤️</p>`;
-
-                    return;
-
-                }
-
-                snapshot.forEach(doc => {
-
-                    const data =
-                        doc.data();
-
-                    const card =
-                        document.createElement("div");
-
-                    card.className =
-                        "response glass";
-
-                    let date = "";
-
-                    if (data.createdAt) {
-
-                        date =
-                            data.createdAt
-                                .toDate()
-                                .toLocaleString();
-
                     }
 
-                    card.innerHTML = `
+                </div>
 
-                        <div class="answer">
-                            ${data.answer || "Unknown"}
-                        </div>
+                ${questionsHTML}
 
-                        <div class="message">
-                            ${escapeHTML(
-                                data.message || ""
-                            )}
-                        </div>
+            `;
 
-                        <div class="date">
-                            ${date}
-                        </div>
+            container.appendChild(card);
 
-                    `;
+        });
 
-                    responses.appendChild(card);
+        status.innerText =
+            `${responses.length} response${
+                responses.length === 1 ? "" : "s"
+            }`;
 
-                });
+    } catch (error) {
 
-            } catch(e) {
+        console.error(error);
 
-                console.error(e);
+        status.innerText = "Error";
 
-                responses.innerHTML =
-                    "Unable to load responses.";
+        container.innerHTML = `
+            <div class="error">
 
-            }
+                ❌ Unable to load responses.
 
-        }
-    );
+                <br><br>
 
+                ${escapeHTML(error.message)}
+
+            </div>
+        `;
+    }
 }
 
 
-/* LOGOUT */
-
-const logout =
-    document.getElementById("logout");
-
-if (logout) {
-
-    logout.addEventListener(
+document
+    .getElementById("refreshButton")
+    .addEventListener(
         "click",
-        async () => {
-
-            await signOut(auth);
-
-            window.location.href =
-                "index.html";
-
-        }
+        loadResponses
     );
 
-}
 
-
-/* SECURITY */
-
-function escapeHTML(text) {
-
-    const div =
-        document.createElement("div");
-
-    div.textContent = text;
-
-    return div.innerHTML;
-
-}
+loadResponses();
